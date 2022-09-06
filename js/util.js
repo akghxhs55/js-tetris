@@ -29,7 +29,7 @@ function newGame() {
     }
 
     let movingBlock = bag.pop();
-    let movingRow = 0;
+    let movingRow = 2;
     let movingCol = 4;
     let movingStat = 0;
 
@@ -50,8 +50,8 @@ function updateScreen(game) {
     }
 
     let rows = game.gameTable.rows;
-    for (let i = 0; i < ROWS; i++) {
-        let cells = rows[i].cells;
+    for (let i = 2; i < ROWS; i++) {
+        let cells = rows[i - 2].cells;
         for (let j = 0; j < COLS; j++) {
             let div = cells[j].firstChild;
             if (div.dataset.type != game.map[i][j]) {

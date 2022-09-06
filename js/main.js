@@ -9,7 +9,7 @@ game.appendChild(gameTable);
 
 let unit = +game.clientWidth / 10;
 
-for (let i = 0; i < ROWS; i++) {
+for (let i = 2; i < ROWS; i++) {
     let row = document.createElement('tr');
     gameTable.appendChild(row);
 
@@ -20,7 +20,7 @@ for (let i = 0; i < ROWS; i++) {
         let div = document.createElement('div');
         div.className = 'cell';
         div.dataset.type = '0';
-        div.style.top = i * unit + 'px';
+        div.style.top = (i - 2) * unit + 'px';
         div.style.left = j * unit + 'px';
         cell.appendChild(div);
 

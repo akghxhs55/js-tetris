@@ -2,15 +2,19 @@
 
 
 function mainLoop(game) {
-    let result = blockDown(game);
+    let result = blockDownAuto(game);
     
     updateScreen(game);
+
+    clearTimeout(game.timer);
+    game.prevTime = Date.now();
+    game.timer = setTimeout(mainLoop, interval, game);
 }
 
 
 function gameOver(game) {
     alert('Game Over!');
-    clearInterval(game.timer);
+    clearTimeout(game.timer);
 }
 
 
@@ -19,11 +23,11 @@ function isOverlap(game) {
         let x = game.movingRow + dx;
         let y = game.movingCol + dy;
 
-        if (x >= ROWS || y < 0 || y >= COLS) {
+        if (x < 0 || x >= ROWS || y < 0 || y >= COLS) {
             return true;
         }
 
-        if (x >= 0 && game.map[x][y] != 0) {
+        if (game.map[x][y] != 0) {
             return true;
         }
     }
@@ -32,7 +36,7 @@ function isOverlap(game) {
 }
 
 
-function blockDown(game) {
+function blockDownAuto(game) {
     game.movingRow++;
 
     let result = isOverlap(game);
@@ -48,12 +52,40 @@ function blockDown(game) {
         }
 
         game.movingBlock = game.bag.pop();
-        game.movingRow = 0;
+        game.movingRow = 2;
         game.movingCol = 4;
         game.movingStat = 0;
 
         if (game.bag.length <= 7) {
             game.bag = game.bag.concat(newBag());
+        }
+
+        clearTimeout(game.timer);
+        game.prevTime = Date.now();
+        game.timer = setTimeout(mainLoop, interval, game);
+    }
+
+    return !result;
+}
+
+
+function blockDown(game, isHard = false) {
+    if (Date.now() - game.prevTime < errInterval) {
+        return false;
+    }
+
+    game.movingRow++;
+
+    let result = isOverlap(game);
+
+    if (result) {
+        game.movingRow--;
+    }
+    else {
+        if (!isHard && interval - (Date.now() - game.prevTime) < minInterval) {
+            clearTimeout(game.timer);
+            game.prevTime = Date.now();
+            game.timer = setTimeout(mainLoop, minInterval, game);
         }
     }
 
@@ -132,7 +164,8 @@ document.body.addEventListener('keydown', function(event) {
     else if (event.code == 'Space') {
         // hard drop
 
-        while (blockDown(nowGame)) {}
+        while (blockDown(nowGame, true)) {}
+        blockDownAuto(nowGame);
     }
     else if (event.code == 'KeyZ' || event.code == 'ControlLeft') {
         // rotate counter clockwise
@@ -146,10 +179,9 @@ document.body.addEventListener('keydown', function(event) {
     }
 
     updateScreen(nowGame);
-
-    event.preventDefault();
 });
 
 
 
-nowGame.timer = setInterval(mainLoop, interval, nowGame);
+game.prevTime = Date.now();
+game.timer = setTimeout(mainLoop, 1000, nowGame);
