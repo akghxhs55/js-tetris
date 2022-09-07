@@ -3,9 +3,9 @@
 const ROWS = 22;
 const COLS = 10;
 
-const interval = 1200;
-const minInterval = 250;
-const errInterval = 50;
+const interval = 1000;
+const minInterval = 200;
+const errInterval = 40;
 
 const blockStat = {
     1: {
