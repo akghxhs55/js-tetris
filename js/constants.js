@@ -3,11 +3,7 @@
 const ROWS = 22;
 const COLS = 10;
 
-const interval = 1000;
-const minInterval = 200;
-const errInterval = 40;
-
-const blockStat = {
+const BLOCKSTAT = {
     1: {
         0: [[0, -1], [0, 0], [0, 1], [0, 2]],
         1: [[-1, 1], [0, 1], [1, 1], [2, 1]],

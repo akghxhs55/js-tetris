@@ -38,7 +38,7 @@ function newGame() {
 
 
 function updateScreen(game) {
-    for (let [dx, dy] of blockStat[game.movingBlock][game.movingStat]) {
+    for (let [dx, dy] of BLOCKSTAT[game.movingBlock][game.movingStat]) {
         let x = game.movingRow + dx;
         let y = game.movingCol + dy;
         
@@ -61,7 +61,7 @@ function updateScreen(game) {
         }
     }
 
-    for (let [dx, dy] of blockStat[game.movingBlock][game.movingStat]) {
+    for (let [dx, dy] of BLOCKSTAT[game.movingBlock][game.movingStat]) {
         let x = game.movingRow + dx;
         let y = game.movingCol + dy;
         

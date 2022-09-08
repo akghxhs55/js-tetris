@@ -8,18 +8,12 @@ function mainLoop(game) {
 
     clearTimeout(game.timer);
     game.prevTime = Date.now();
-    game.timer = setTimeout(mainLoop, interval, game);
-}
-
-
-function gameOver(game) {
-    alert('Game Over!');
-    clearTimeout(game.timer);
+    game.timer = setTimeout(mainLoop, game.interval, game);
 }
 
 
 function isOverlap(game) {
-    for (let [dx, dy] of blockStat[game.movingBlock][game.movingStat]) {
+    for (let [dx, dy] of BLOCKSTAT[game.movingBlock][game.movingStat]) {
         let x = game.movingRow + dx;
         let y = game.movingCol + dy;
 
@@ -44,7 +38,7 @@ function blockDownAuto(game) {
     if (result) {
         game.movingRow--;
 
-        for (let [dx, dy] of blockStat[game.movingBlock][game.movingStat]) {
+        for (let [dx, dy] of BLOCKSTAT[game.movingBlock][game.movingStat]) {
             let x = game.movingRow + dx;
             let y = game.movingCol + dy;
 
@@ -62,7 +56,7 @@ function blockDownAuto(game) {
 
         clearTimeout(game.timer);
         game.prevTime = Date.now();
-        game.timer = setTimeout(mainLoop, interval, game);
+        game.timer = setTimeout(mainLoop, game.interval, game);
     }
 
     return !result;
@@ -70,10 +64,6 @@ function blockDownAuto(game) {
 
 
 function blockDown(game, isHard = false) {
-    if (Date.now() - game.prevTime < errInterval) {
-        return false;
-    }
-
     game.movingRow++;
 
     let result = isOverlap(game);
@@ -82,10 +72,10 @@ function blockDown(game, isHard = false) {
         game.movingRow--;
     }
     else {
-        if (!isHard && interval - (Date.now() - game.prevTime) < minInterval) {
+        if (!isHard && game.interval - (Date.now() - game.prevTime) < game.minInterval) {
             clearTimeout(game.timer);
             game.prevTime = Date.now();
-            game.timer = setTimeout(mainLoop, minInterval, game);
+            game.timer = setTimeout(mainLoop, game.minInterval, game);
         }
     }
 
@@ -183,5 +173,9 @@ document.body.addEventListener('keydown', function(event) {
 
 
 
-game.prevTime = Date.now();
-game.timer = setTimeout(mainLoop, 1000, nowGame);
+nowGame.interval = 1000;
+nowGame.minInterval = 400;
+
+
+nowGame.prevTime = Date.now();
+nowGame.timer = setTimeout(mainLoop, nowGame.interval, nowGame);
