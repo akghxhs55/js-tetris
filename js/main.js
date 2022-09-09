@@ -1,13 +1,13 @@
 'use strict';
 
 
-let game = document.getElementById('game');
+let gameDiv = document.getElementById('game-div');
 
 let gameTable = document.createElement('table');
 gameTable.className = 'game-table';
-game.appendChild(gameTable);
+gameDiv.appendChild(gameTable);
 
-let unit = +game.clientWidth / 10;
+let unit = +gameDiv.clientWidth / 10;
 
 for (let i = 2; i < ROWS; i++) {
     let row = document.createElement('tr');

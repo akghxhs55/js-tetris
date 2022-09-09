@@ -3,7 +3,7 @@
 
 function mainLoop(game) {
     let result = blockDownAuto(game);
-    
+
     updateScreen(game);
 
     clearTimeout(game.timer);
@@ -71,13 +71,6 @@ function blockDown(game, isHard = false) {
     if (result) {
         game.movingRow--;
     }
-    else {
-        if (!isHard && game.interval - (Date.now() - game.prevTime) < game.minInterval) {
-            clearTimeout(game.timer);
-            game.prevTime = Date.now();
-            game.timer = setTimeout(mainLoop, game.minInterval, game);
-        }
-    }
 
     return !result;
 }
@@ -135,37 +128,45 @@ function blockRotateRight(game) {
 }
 
 
-document.body.addEventListener('keydown', function(event) {
+document.body.addEventListener('keydown', function (event) {
+    let result;
+
     if (event.code == 'ArrowLeft') {
         // move left
 
-        blockLeft(nowGame);
+        result = blockLeft(nowGame);
     }
     else if (event.code == 'ArrowRight') {
         // move right
 
-        blockRight(nowGame);
+        result = blockRight(nowGame);
     }
     else if (event.code == 'ArrowDown') {
         // soft drop
 
-        blockDown(nowGame);
+        result = blockDown(nowGame);
     }
     else if (event.code == 'Space') {
         // hard drop
 
-        while (blockDown(nowGame, true)) {}
-        blockDownAuto(nowGame);
+        while (blockDown(nowGame, true)) { }
+        result = blockDownAuto(nowGame);
     }
     else if (event.code == 'KeyZ' || event.code == 'ControlLeft') {
         // rotate counter clockwise
-        
-        blockRotateLeft(nowGame);
+
+        result = blockRotateLeft(nowGame);
     }
     else if (event.code == 'KeyX' || event.code == 'ArrowUp') {
         // rotate clockwise
 
-        blockRotateRight(nowGame);
+        result = blockRotateRight(nowGame);
+    }
+
+    if (result) {
+        clearTimeout(nowGame.timer);
+        nowGame.prevTime = Date.now();
+        nowGame.timer = setTimeout(mainLoop, nowGame.interval, nowGame);
     }
 
     updateScreen(nowGame);
