@@ -103,28 +103,50 @@ function blockRight(game) {
 
 
 function blockRotateLeft(game) {
+    let preset = game.movingBlock == 1 ? 1 : 2;
+    let rotateStat = '' + game.movingStat + (game.movingStat + 3) % 4;
     game.movingStat = (game.movingStat + 3) % 4;
 
-    let result = isOverlap(game);
+    for (let idx = 0; idx < 5; idx++) {
+        game.movingRow += PRESET[preset][rotateStat][idx][0];
+        game.movingCol += PRESET[preset][rotateStat][idx][1];
 
-    if (result) {
-        game.movingStat = (game.movingStat + 1) % 4;
+        let result = isOverlap(game);
+        if (!result) {
+            return true;
+        }
+
+        game.movingRow -= PRESET[preset][rotateStat][idx][0];
+        game.movingCol -= PRESET[preset][rotateStat][idx][1];
     }
 
-    return !result;
+    game.movingStat = (game.movingStat + 1) % 4;
+
+    return false;
 }
 
 
 function blockRotateRight(game) {
+    let preset = game.movingBlock == 1 ? 1 : 2;
+    let rotateStat = '' + game.movingStat + (game.movingStat + 1) % 4;
     game.movingStat = (game.movingStat + 1) % 4;
 
-    let result = isOverlap(game);
+    for (let idx = 0; idx < 5; idx++) {
+        game.movingRow += PRESET[preset][rotateStat][idx][0];
+        game.movingCol += PRESET[preset][rotateStat][idx][1];
 
-    if (result) {
-        game.movingStat = (game.movingStat + 3) % 4;
+        let result = isOverlap(game);
+        if (!result) {
+            return true;
+        }
+
+        game.movingRow -= PRESET[preset][rotateStat][idx][0];
+        game.movingCol -= PRESET[preset][rotateStat][idx][1];
     }
 
-    return !result;
+    game.movingStat = (game.movingStat + 3) % 4;
+
+    return false;
 }
 
 
