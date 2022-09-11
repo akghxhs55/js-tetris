@@ -46,6 +46,8 @@ function blockDown(game, isAuto = false) {
                 game.map[x][y] = game.movingBlock;
             }
 
+            checkMap(game);
+
             game.movingBlock = game.bag.pop();
             game.movingRow = 2;
             game.movingCol = 4;
@@ -53,6 +55,19 @@ function blockDown(game, isAuto = false) {
 
             if (game.bag.length <= 7) {
                 game.bag = game.bag.concat(newBag());
+            }
+
+            if (isOverlap(game)) {
+                clearTimeout(game.timer);
+                clearTimeout(game.leftTimer);
+                clearTimeout(game.rightTimer);
+                clearInterval(game.downTimer);
+
+                game.gameOver = true;
+                game.movingRow = -1;
+                game.movingCol = -1;
+
+                return false;
             }
         }
 
@@ -155,7 +170,38 @@ function blockRotateRight(game) {
 }
 
 
+function checkMap(game) {
+    let clearLine = [];
+
+    for (let i = 0; i < ROWS; i++) {
+        let isFull = true;
+        for (let j = 0; j < COLS; j++) {
+            if (game.map[i][j] == 0) {
+                isFull = false;
+                break;
+            }
+        }
+
+        if (isFull) {
+            clearLine.push(i);
+        }
+    }
+
+    for (let line of clearLine) {
+        for (let i = line; i > 0; i--) {
+            game.map[i] = game.map[i - 1].slice();
+        }
+
+        game.map[0] = new Array(COLS).fill(0);
+    }
+}
+
+
 document.body.addEventListener('keydown', function (event) {
+    if (nowGame.gameOver) {
+        return;
+    }
+
     if (event.code == 'ArrowLeft') {
         // move left
 
