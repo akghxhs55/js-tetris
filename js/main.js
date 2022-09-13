@@ -1,6 +1,12 @@
 'use strict';
 
 
+for (let i = 0; i <= 7; i++) {
+    let img = new Image();
+    img.src = `img/block_${i}.png`;
+}
+
+
 let gameDiv = document.getElementById('game-div');
 
 let gameTable = document.createElement('table');
