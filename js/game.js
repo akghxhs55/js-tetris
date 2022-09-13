@@ -46,6 +46,8 @@ function blockDown(game, isAuto = false) {
                 game.map[x][y] = game.movingBlock;
             }
 
+            game.holdUsed = false;
+
             checkMap(game);
 
             game.movingBlock = game.bag.pop();
@@ -170,6 +172,43 @@ function blockRotateRight(game) {
 }
 
 
+function blockHold(game) {
+    if (game.holdBlock == null) {
+        game.holdBlock = game.movingBlock;
+
+        game.movingBlock = game.bag.pop();
+        game.movingRow = 2;
+        game.movingCol = 4;
+        game.movingStat = 0;
+
+        if (game.bag.length <= 7) {
+            game.bag = game.bag.concat(newBag());
+        }
+    }
+    else {
+        [game.holdBlock, game.movingBlock] = [game.movingBlock, game.holdBlock];
+        game.movingRow = 2;
+        game.movingCol = 4;
+        game.movingStat = 0;
+    }
+
+    game.holdUsed = true;
+
+    if (isOverlap(game)) {
+        clearTimeout(game.timer);
+        clearTimeout(game.leftTimer);
+        clearTimeout(game.rightTimer);
+        clearInterval(game.downTimer);
+
+        game.gameOver = true;
+        game.movingRow = -1;
+        game.movingCol = -1;
+
+        return false;
+    }
+}
+
+
 function checkMap(game) {
     let clearLine = [];
 
@@ -258,6 +297,11 @@ document.body.addEventListener('keydown', function (event) {
         // rotate clockwise
 
         blockRotateRight(nowGame);
+    }
+    else if (event.code == 'KeyC' || event.code == 'ShiftLeft') {
+        // hold
+
+        if (!nowGame.holdUsed) blockHold(nowGame);
     }
 
     updateScreen(nowGame);

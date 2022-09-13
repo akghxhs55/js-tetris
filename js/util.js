@@ -32,8 +32,10 @@ function newGame() {
     let movingRow = 2;
     let movingCol = 4;
     let movingStat = 0;
+    let holdBlock = null;
+    let holdUsed = false;
 
-    return { bag, map, movingBlock, movingRow, movingCol, movingStat };
+    return { bag, map, movingBlock, movingRow, movingCol, movingStat, holdBlock, holdUsed };
 }
 
 
