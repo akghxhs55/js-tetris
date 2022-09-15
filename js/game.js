@@ -2,13 +2,12 @@
 
 
 function mainLoop(game) {
+    clearTimeout(game.timer);
+    game.timer = setTimeout(mainLoop, game.interval, game);
+    
     let result = blockDown(game, true);
 
     updateScreen(game);
-
-    clearTimeout(game.timer);
-    game.prevTime = Date.now();
-    game.timer = setTimeout(mainLoop, game.interval, game);
 }
 
 
@@ -27,6 +26,17 @@ function isOverlap(game) {
     }
 
     return false;
+}
+
+
+function isLock(game) {
+    game.movingRow++;
+
+    let result = isOverlap(game);
+
+    game.movingRow--;
+
+    return result;
 }
 
 
@@ -76,8 +86,7 @@ function blockDown(game, isAuto = false) {
     }
     else {
         clearTimeout(game.timer);
-        game.prevTime = Date.now();
-        game.timer = setTimeout(mainLoop, game.interval, game);
+        game.timer = setTimeout(mainLoop, isLock(game) ? game.lockDelay : game.interval, game);
     }
 
     return !result;
@@ -91,6 +100,12 @@ function blockLeft(game) {
 
     if (result) {
         game.movingCol++;
+    }
+    else {
+        if (isLock(game)) {
+            clearTimeout(game.timer);
+            game.timer = setTimeout(mainLoop, game.lockDelay, game);
+        }
     }
 
     if (game.leftTime != null && Date.now() - game.leftTime >= game.das) {
@@ -111,6 +126,12 @@ function blockRight(game) {
 
     if (result) {
         game.movingCol--;
+    }
+    else {
+        if (isLock(game)) {
+            clearTimeout(game.timer);
+            game.timer = setTimeout(mainLoop, game.lockDelay, game);
+        }
     }
 
     if (game.rightTime != null && Date.now() - game.rightTime >= game.das) {
@@ -135,6 +156,11 @@ function blockRotateLeft(game) {
 
         let result = isOverlap(game);
         if (!result) {
+            if (isLock(game)) {
+                clearTimeout(game.timer);
+                game.timer = setTimeout(mainLoop, game.lockDelay, game);
+            }
+
             return true;
         }
 
@@ -159,6 +185,11 @@ function blockRotateRight(game) {
 
         let result = isOverlap(game);
         if (!result) {
+            if (isLock(game)) {
+                clearTimeout(game.timer);
+                game.timer = setTimeout(mainLoop, game.lockDelay, game);
+            }
+
             return true;
         }
 
@@ -285,7 +316,7 @@ document.body.addEventListener('keydown', function (event) {
     else if (event.code == 'Space') {
         // hard drop
 
-        while (blockDown(nowGame)) { }
+        while (blockDown(nowGame)) {}
         blockDown(nowGame, true);
     }
     else if (event.code == 'KeyZ' || event.code == 'ControlLeft') {
@@ -332,7 +363,7 @@ nowGame.interval = 750;
 nowGame.das = 165;
 nowGame.arr = 33;
 nowGame.sdf = 60;
+nowGame.lockDelay = 500;
 
 
-nowGame.prevTime = Date.now();
 nowGame.timer = setTimeout(mainLoop, nowGame.interval, nowGame);
