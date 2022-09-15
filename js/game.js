@@ -4,6 +4,7 @@
 function mainLoop(game) {
     clearTimeout(game.timer);
     game.timer = setTimeout(mainLoop, game.interval, game);
+    game.nextTime = Date.now() + game.interval;
     
     let result = blockDown(game, true);
 
@@ -86,7 +87,9 @@ function blockDown(game, isAuto = false) {
     }
     else {
         clearTimeout(game.timer);
-        game.timer = setTimeout(mainLoop, isLock(game) ? game.lockDelay : game.interval, game);
+        let delay = isLock(game) ? game.lockDelay : game.interval;
+        game.timer = setTimeout(mainLoop, delay, game);
+        game.nextTime = Date.now() + delay;
     }
 
     return !result;
@@ -105,6 +108,7 @@ function blockLeft(game) {
         if (isLock(game)) {
             clearTimeout(game.timer);
             game.timer = setTimeout(mainLoop, game.lockDelay, game);
+            game.nextTime = Date.now() + game.lockDelay;
         }
     }
 
@@ -131,6 +135,7 @@ function blockRight(game) {
         if (isLock(game)) {
             clearTimeout(game.timer);
             game.timer = setTimeout(mainLoop, game.lockDelay, game);
+            game.nextTime = Date.now() + game.lockDelay;
         }
     }
 
@@ -159,6 +164,7 @@ function blockRotateLeft(game) {
             if (isLock(game)) {
                 clearTimeout(game.timer);
                 game.timer = setTimeout(mainLoop, game.lockDelay, game);
+                game.nextTime = Date.now() + game.lockDelay;
             }
 
             return true;
@@ -188,6 +194,7 @@ function blockRotateRight(game) {
             if (isLock(game)) {
                 clearTimeout(game.timer);
                 game.timer = setTimeout(mainLoop, game.lockDelay, game);
+                game.nextTime = Date.now() + game.lockDelay;
             }
 
             return true;
@@ -261,7 +268,7 @@ function checkMap(game) {
         for (let i = line; i > 0; i--) {
             game.map[i] = game.map[i - 1].slice();
         }
-
+        
         game.map[0] = new Array(COLS).fill(0);
     }
 }
@@ -269,6 +276,49 @@ function checkMap(game) {
 
 document.body.addEventListener('keydown', function (event) {
     if (nowGame.gameOver) {
+        return;
+    }
+    
+    if (event.code == 'Escape') {
+        // pause
+    
+        if (nowGame.pause) {
+            nowGame.pause = false;
+            nowGame.timer = setTimeout(mainLoop, nowGame.pauseTime, nowGame);
+            nowGame.nextTime = Date.now() + nowGame.pauseTime;
+
+            for (let i = 2; i < ROWS; i++) {
+                let cells = nowGame.gameTable.rows[i - 2].cells;
+                for (let j = 0; j < COLS; j++) {
+                    let div = cells[j].firstChild;
+    
+                    let img = div.firstChild;
+    
+                    img.style.filter = '';
+                    console.log(img);
+                }
+            }
+        }
+        else {
+            nowGame.pause = true;
+            nowGame.pauseTime = nowGame.nextTime - Date.now();
+            clearTimeout(nowGame.timer);
+            
+            for (let i = 2; i < ROWS; i++) {
+                let cells = nowGame.gameTable.rows[i - 2].cells;
+                for (let j = 0; j < COLS; j++) {
+                    let div = cells[j].firstChild;
+    
+                    let img = div.firstChild;
+    
+                    img.style.filter = 'blur(2px)';
+                    console.log(img);
+                }
+            }
+        }
+    }
+    
+    if (nowGame.pause) {
         return;
     }
 
@@ -367,3 +417,4 @@ nowGame.lockDelay = 500;
 
 
 nowGame.timer = setTimeout(mainLoop, nowGame.interval, nowGame);
+nowGame.nextTime = Date.now() + nowGame.interval;

@@ -34,6 +34,7 @@ function newGame() {
     let movingStat = 0;
     let holdBlock = null;
     let holdUsed = false;
+    let pause = false;
 
     return { bag, map, movingBlock, movingRow, movingCol, movingStat, holdBlock, holdUsed };
 }
