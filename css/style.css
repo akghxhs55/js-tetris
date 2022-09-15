@@ -1,13 +1,22 @@
+body {
+    background-color: rgb(71, 76, 90);
+}
+
 #game-div {
     position: absolute;
     border: 2px solid #555;
     width: 30vh;
     height: 60vh;
+    left: 50%;
+    top: 5vh;
+    margin-left: -15vh;
 }
 
-#game-table {
+.game-table {
     position: absolute;
     border-collapse: collapse;
+    top: 0px;
+    bottom: 0px;
 }
 
 .cell {

@@ -39,6 +39,22 @@ function newGame() {
 }
 
 
+function reSizeScreen(game, unit) {
+    for (let i = 2; i < ROWS; i++) {
+        let cells = game.gameTable.rows[i - 2].cells;
+        for (let j = 0; j < COLS; j++) {
+            let div = cells[j].firstChild;
+            div.style.top = (i - 2) * unit + 'px';
+            div.style.left = j * unit + 'px';
+
+            let img = div.firstChild;
+            img.style.width = unit + 'px';
+            img.style.height = unit + 'px';
+        }
+    }
+}
+
+
 function updateScreen(game) {
     for (let [dx, dy] of BLOCKSTAT[game.movingBlock][game.movingStat]) {
         let x = game.movingRow + dx;

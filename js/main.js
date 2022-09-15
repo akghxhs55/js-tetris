@@ -43,3 +43,9 @@ let nowGame = newGame();
 nowGame.gameTable = gameTable;
 
 updateScreen(nowGame);
+
+
+addEventListener('resize', function(event) {
+    unit = +gameDiv.clientWidth / 10;
+    reSizeScreen(nowGame, unit);
+});
