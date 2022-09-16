@@ -381,7 +381,7 @@ document.body.addEventListener('keyup', function (event) {
 
 
 nowGame.interval = 750;
-nowGame.das = 165;
+nowGame.das = 200;
 nowGame.arr = 33;
 nowGame.sdf = 60;
 nowGame.lockDelay = 500;
