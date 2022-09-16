@@ -35,8 +35,38 @@ function newGame() {
     let holdBlock = null;
     let holdUsed = false;
     let pause = false;
+    let ghost = new Set();
 
-    return { bag, map, movingBlock, movingRow, movingCol, movingStat, holdBlock, holdUsed };
+    return { bag, map, movingBlock, movingRow, movingCol, movingStat, holdBlock, holdUsed, pause, ghost };
+}
+
+
+function isOverlap(game) {
+    for (let [dx, dy] of BLOCKSTAT[game.movingBlock][game.movingStat]) {
+        let x = game.movingRow + dx;
+        let y = game.movingCol + dy;
+
+        if (x < 0 || x >= ROWS || y < 0 || y >= COLS) {
+            return true;
+        }
+
+        if (game.map[x][y] != 0) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+
+function isLock(game) {
+    game.movingRow++;
+
+    let result = isOverlap(game);
+
+    game.movingRow--;
+
+    return result;
 }
 
 
@@ -57,6 +87,11 @@ function reSizeScreen(game, unit) {
 
 
 function updateScreen(game) {
+    for (let img of game.ghost) {
+        img.remove();
+    }
+    game.ghost.clear();
+
     for (let [dx, dy] of BLOCKSTAT[game.movingBlock][game.movingStat]) {
         let x = game.movingRow + dx;
         let y = game.movingCol + dy;
@@ -73,6 +108,7 @@ function updateScreen(game) {
         let cells = rows[i - 2].cells;
         for (let j = 0; j < COLS; j++) {
             let div = cells[j].firstChild;
+            div.firstChild.style.opacity = '1';
             if (div.dataset.type != game.map[i][j]) {
                 div.dataset.type = game.map[i][j];
                 div.firstChild.src = 'img/block_' + game.map[i][j] + '.png';
@@ -90,4 +126,36 @@ function updateScreen(game) {
 
         game.map[x][y] = 0;
     }
+
+
+    let [originRow, originCol] = [game.movingRow, game.movingCol];
+    while (true) {
+        game.movingRow++;
+        if (isOverlap(game)) {
+            game.movingRow--;
+            break;
+        }
+    }
+
+    for (let [dx, dy] of BLOCKSTAT[game.movingBlock][game.movingStat]) {
+        let x = game.movingRow + dx;
+        let y = game.movingCol + dy;
+        
+        if (x < 2 || x >= ROWS || y < 0 || y >= COLS) {
+            continue;
+        }
+
+        let div = rows[x - 2].cells[y].firstChild;
+        
+        let ghostImg = document.createElement('img');
+        ghostImg.className = 'ghost-img'
+        ghostImg.src = 'img/block_' + game.movingBlock + '.png';
+        ghostImg.style.width = div.firstChild.style.width;
+        ghostImg.style.height = div.firstChild.style.height;
+        div.appendChild(ghostImg);
+
+        game.ghost.add(ghostImg);
+    }
+
+    [game.movingRow, game.movingCol] = [originRow, originCol];
 }

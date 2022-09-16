@@ -2,42 +2,13 @@
 
 
 function mainLoop(game) {
+    let result = blockDown(game, true);
+
     clearTimeout(game.timer);
     game.timer = setTimeout(mainLoop, game.interval, game);
     game.nextTime = Date.now() + game.interval;
-    
-    let result = blockDown(game, true);
 
     updateScreen(game);
-}
-
-
-function isOverlap(game) {
-    for (let [dx, dy] of BLOCKSTAT[game.movingBlock][game.movingStat]) {
-        let x = game.movingRow + dx;
-        let y = game.movingCol + dy;
-
-        if (x < 0 || x >= ROWS || y < 0 || y >= COLS) {
-            return true;
-        }
-
-        if (game.map[x][y] != 0) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-
-function isLock(game) {
-    game.movingRow++;
-
-    let result = isOverlap(game);
-
-    game.movingRow--;
-
-    return result;
 }
 
 
