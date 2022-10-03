@@ -239,9 +239,36 @@ function checkMap(game) {
         for (let i = line; i > 0; i--) {
             game.map[i] = game.map[i - 1].slice();
         }
-        
+
         game.map[0] = new Array(COLS).fill(0);
     }
+}
+
+
+function restartGame(game) {
+    for (let img of game.ghost) {
+        img.remove();
+    }
+    clearTimeout(game.timer);
+    clearTimeout(game.leftTImer);
+    clearTimeout(game.rightTimer);
+    clearTimeout(game.downTimer);
+
+
+    let nextGame = newGame();
+    nextGame.gameTable = document.getElementsByClassName('game-table')[0];
+
+    nextGame.interval = 750;
+    nextGame.das = 200;
+    nextGame.arr = 33;
+    nextGame.sdf = 60;
+    nextGame.lockDelay = 500;
+
+
+    nextGame.timer = setTimeout(mainLoop, nextGame.interval, nextGame);
+    nextGame.nextTime = Date.now() + nextGame.interval;
+
+    return nextGame;
 }
 
 
@@ -249,10 +276,26 @@ document.body.addEventListener('keydown', function (event) {
     if (nowGame.gameOver) {
         return;
     }
-    
-    if (event.code == 'Escape') {
+
+    if (event.code == 'KeyR') {
+        // restart
+        for (let i = 2; i < ROWS; i++) {
+            let cells = nowGame.gameTable.rows[i - 2].cells;
+            for (let j = 0; j < COLS; j++) {
+                let div = cells[j].firstChild;
+
+                let img = div.firstChild;
+
+                img.style.filter = '';
+                console.log(img);
+            }
+        }
+
+        nowGame = restartGame(nowGame);
+    }
+    else if (event.code == 'Escape') {
         // pause
-    
+
         if (nowGame.pause) {
             nowGame.pause = false;
             nowGame.timer = setTimeout(mainLoop, nowGame.pauseTime, nowGame);
@@ -262,9 +305,9 @@ document.body.addEventListener('keydown', function (event) {
                 let cells = nowGame.gameTable.rows[i - 2].cells;
                 for (let j = 0; j < COLS; j++) {
                     let div = cells[j].firstChild;
-    
+
                     let img = div.firstChild;
-    
+
                     img.style.filter = '';
                     console.log(img);
                 }
@@ -274,21 +317,33 @@ document.body.addEventListener('keydown', function (event) {
             nowGame.pause = true;
             nowGame.pauseTime = nowGame.nextTime - Date.now();
             clearTimeout(nowGame.timer);
+
+            clearTimeout(nowGame.leftTimer);
+            nowGame.leftTime = null;
+            nowGame.leftTImer = null;
+
+            clearTimeout(nowGame.rightTimer);
+            nowGame.rightTime = null;
+            nowGame.rightTimer = null;
+
+            clearInterval(nowGame.downTimer);
+            nowGame.downTime = null;
             
+
             for (let i = 2; i < ROWS; i++) {
                 let cells = nowGame.gameTable.rows[i - 2].cells;
                 for (let j = 0; j < COLS; j++) {
                     let div = cells[j].firstChild;
-    
+
                     let img = div.firstChild;
-    
+
                     img.style.filter = 'blur(2px)';
                     console.log(img);
                 }
             }
         }
     }
-    
+
     if (nowGame.pause) {
         return;
     }
@@ -337,7 +392,7 @@ document.body.addEventListener('keydown', function (event) {
     else if (event.code == 'Space') {
         // hard drop
 
-        while (blockDown(nowGame)) {}
+        while (blockDown(nowGame)) { }
         blockDown(nowGame, true);
     }
     else if (event.code == 'KeyZ' || event.code == 'ControlLeft') {
@@ -356,13 +411,12 @@ document.body.addEventListener('keydown', function (event) {
         if (!nowGame.holdUsed) blockHold(nowGame);
     }
 
+
     updateScreen(nowGame);
 });
 
 
 document.body.addEventListener('keyup', function (event) {
-    let result;
-
     if (event.code == 'ArrowLeft') {
         clearTimeout(nowGame.leftTimer);
         nowGame.leftTime = null;
